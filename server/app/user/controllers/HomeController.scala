@@ -12,7 +12,7 @@ class HomeController(cc: ControllerComponents, wsClient: WSClient)(implicit ec: 
 
   def index = Action {
     logger.debug("index action")
-    Ok("Welcome to your new application")
+    Ok(core.views.html.index())
   }
 
   def about = Action {

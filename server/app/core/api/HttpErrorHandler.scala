@@ -10,9 +10,11 @@ class HttpErrorHandler(implicit val messagesApi: MessagesApi)
     extends play.api.http.HttpErrorHandler
     with I18nSupport {
   val logger = play.api.Logger(this.getClass)
-  def onClientError(request: RequestHeader,
-                    statusCode: Int,
-                    message: String = ""): Future[Result] = {
+  def onClientError(
+    request: RequestHeader,
+    statusCode: Int,
+    message: String = ""
+  ): Future[Result] = {
     implicit val messages = messagesApi.preferred(request)
     statusCode match {
       case BAD_REQUEST => Future.successful(ApiErrors.badRequest(message).toResult)
@@ -20,9 +22,9 @@ class HttpErrorHandler(implicit val messagesApi: MessagesApi)
         Future.successful(ApiErrors.routeNotFound(request.method, request.path).toResult)
       case FORBIDDEN => Future.successful(ApiErrors.forbidden(message).toResult)
       case _ =>
-        Future.successful(ApiError(status = Results.Status(statusCode),
-                                   key = "apierror.clienterror",
-                                   message).toResult)
+        Future.successful(
+          ApiError(status = Results.Status(statusCode), key = "apierror.clienterror", message).toResult
+        )
     }
   }
 

@@ -58,19 +58,24 @@ class WSRequestFilterInstrumented(logger: Logger, ec: ExecutionContext) extends 
   private def logRequest(requestId: Int, request: StandaloneWSRequest): Unit =
     logger.trace(s"WS id=${requestId}: ${request.method} ${request.url} starts")
 
-  private def logResponse(requestId: Int,
-                          request: StandaloneWSRequest,
-                          response: StandaloneWSResponse): Unit =
+  private def logResponse(
+    requestId: Int,
+    request: StandaloneWSRequest,
+    response: StandaloneWSResponse
+  ): Unit =
     response.status match {
       case status if status >= 100 && status < 300 || status == 303 || status == 304 =>
         logger.trace(
-          s"WS id=${requestId}: ${request.method} ${request.url} completed with status ${status}")
+          s"WS id=${requestId}: ${request.method} ${request.url} completed with status ${status}"
+        )
       case status if status >= 300 && status < 500 =>
         logger.warn(
-          s"WS id=${requestId}: ${request.method} ${request.url} completed with a bad response: ${status}")
+          s"WS id=${requestId}: ${request.method} ${request.url} completed with a bad response: ${status}"
+        )
       case status =>
         logger.error(
-          s"WS id=${requestId}: ${request.method} ${request.url} failed with status ${status}")
+          s"WS id=${requestId}: ${request.method} ${request.url} failed with status ${status}"
+        )
     }
 
   private def logError(requestId: Int, request: StandaloneWSRequest, error: Throwable): Unit =
