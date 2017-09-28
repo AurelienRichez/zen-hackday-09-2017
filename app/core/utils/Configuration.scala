@@ -42,11 +42,14 @@ class Configuration(val configuration: play.api.Configuration) {
     case seq   => Some(seq)
   }
 
-  def getBytes(key: String) = Getter[Long](key, Option(configuration.underlying.getBytes(key)).map(_.toLong))
+  def getBytes(key: String) =
+    Getter[Long](key, Option(configuration.underlying.getBytes(key)).map(_.toLong))
 
   def getDuration(key: String): Getter[Duration] = getString(key).map(Duration.apply)
-  def getDurationInMillis(key: String): Getter[Double] = getString(key).map(Duration.apply).map(_.toUnit(MILLISECONDS))
-  def getFiniteDuration(key: String): Getter[FiniteDuration] = getDurationInMillis(key).map(_.milliseconds)
+  def getDurationInMillis(key: String): Getter[Double] =
+    getString(key).map(Duration.apply).map(_.toUnit(MILLISECONDS))
+  def getFiniteDuration(key: String): Getter[FiniteDuration] =
+    getDurationInMillis(key).map(_.milliseconds)
   def getTimeout(key: String): Getter[Timeout] = getFiniteDuration(key).map(Timeout.apply)
 
   def getURI(key: String): Getter[URI] = getString(key).map(new URI(_))

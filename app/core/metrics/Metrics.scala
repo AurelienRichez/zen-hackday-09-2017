@@ -42,8 +42,10 @@ object CpuUsageMetrics extends JmxSystemMetricRecorderCompanion("jmx-cpu") {
     new CpuUsageMetrics(instrumentFactory)
 }
 
-class CpuUsageMetrics(instrumentFactory: InstrumentFactory) extends GenericEntityRecorder(instrumentFactory) {
-  val operatingSystemBean = ManagementFactory.getOperatingSystemMXBean().asInstanceOf[OperatingSystemMXBean]
+class CpuUsageMetrics(instrumentFactory: InstrumentFactory)
+    extends GenericEntityRecorder(instrumentFactory) {
+  val operatingSystemBean =
+    ManagementFactory.getOperatingSystemMXBean().asInstanceOf[OperatingSystemMXBean]
 
   gauge("process-cpu-usage", () => {
     (operatingSystemBean.getProcessCpuLoad() * 100).toLong
