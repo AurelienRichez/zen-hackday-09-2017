@@ -15,8 +15,7 @@ import scala.concurrent.Future
 abstract class NAction[A, Tag](
   protected val controllerComponents: ControllerComponents,
   materializer: Materializer
-) extends EssentialAction {
-  self =>
+) extends EssentialAction { self =>
   def check(rh: RequestHeader): Future[Either[Result, Tag]]
   def parser: BodyParser[A]
   def apply(request: RequestWithTag[A, Tag]): Future[Result]

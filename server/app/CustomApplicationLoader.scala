@@ -30,7 +30,8 @@ class CustomComponents(context: ApplicationLoader.Context)
   core.metrics.Metrics.start(applicationLifecycle, conf)
 
   // override messagesApi to use Hocon config
-  override lazy val messagesApi = new HoconMessagesApiProvider(environment, configuration, langs, httpConfiguration).get
+  override lazy val messagesApi =
+    new HoconMessagesApiProvider(environment, configuration, langs, httpConfiguration).get
 
   // use this ws client to benefit from automatic metrics and logging
   lazy val instrumentedWSClient = core.metrics.WSClientInstrumented(wsClient)

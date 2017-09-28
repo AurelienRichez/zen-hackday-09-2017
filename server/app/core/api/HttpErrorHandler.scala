@@ -15,7 +15,9 @@ class HttpErrorHandler(implicit val messagesApi: MessagesApi) extends play.api.h
       case NOT_FOUND   => Future.successful(ApiErrors.routeNotFound(request.method, request.path).toResult)
       case FORBIDDEN   => Future.successful(ApiErrors.forbidden(message).toResult)
       case _ =>
-        Future.successful(ApiError(status = Results.Status(statusCode), key = "apierror.clienterror", message).toResult)
+        Future.successful(
+          ApiError(status = Results.Status(statusCode), key = "apierror.clienterror", message).toResult
+        )
     }
   }
 
