@@ -1,1 +1,6 @@
+project/project/
+project/target/
 target/
+logs/
+*.DS_Store
+.docker-data
