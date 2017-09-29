@@ -8,16 +8,33 @@ import scala.util.Random
 case class GeneticAlgo(
   params: GenerationParameters,
   people: Seq[Person],
-  populationSize: Int = GeneticAlgo.defaultPopulationSize
+  populationSize: Int = GeneticAlgo.defaultPopulationSize,
+  tournamentSize: Int = GeneticAlgo.defaultTournamentSize
 ) {
   require(params.groupMaxSizes.sum >= people.size)
 
   private def cost(genes: Seq[Seat]): Double = genesToGroups(genes).map(params.totalCost).sum
 
   def generations()(implicit random: Random = new Random()): Iterator[Generation] =
-    Iterator.iterate(init()) { previousGeneration =>
-      ???
+    Iterator.iterate(init())(nextGeneration)
+
+  private def nextGeneration(
+    currentGeneration: Generation
+  )(implicit rand: Random): Generation = {
+    val population = for (i <- 0 to populationSize) yield {
+      val breeder1 = findBest(rand.shuffle(currentGeneration.population).take(tournamentSize))
+      val breeder2 = findBest(rand.shuffle(currentGeneration.population).take(tournamentSize))
+      breed(breeder1, breeder2)
     }
+    val best = findBest(currentGeneration.best +: population)
+    Generation(population, best)
+  }
+
+  private def breed(breeder1: Seq[Seat], breeder2: Seq[Seat])(implicit rand: Random): Seq[Seat] = {
+    val crossOverPoint = rand.nextInt(breeder1.size)
+    val firstHalf = breeder1.take(crossOverPoint)
+    firstHalf ++ breeder2.diff(firstHalf)
+  }
 
   private def init()(implicit random: Random): Generation = {
     val size = params.groupMaxSizes.sum
@@ -49,9 +66,11 @@ case class GeneticAlgo(
 object GeneticAlgo {
 
   val defaultPopulationSize = 2000
+
+  val defaultTournamentSize = 5
 }
 
-case class Generation(individuals: Seq[Seq[Seat]], best: Seq[Seat])
+case class Generation(population: Seq[Seq[Seat]], best: Seq[Seat])
 
 sealed trait Seat extends Product with Serializable {
 
