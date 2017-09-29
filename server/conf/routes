@@ -4,6 +4,8 @@
 
 # Application's entry point
 GET     /                           user.controllers.HomeController.index
+GET     /people                     user.controllers.HomeController.people(howMany: Int = 10)
+
 GET     /about                      user.controllers.HomeController.about
 GET     /proxy                      user.controllers.HomeController.proxy(url: String)
 

@@ -5,11 +5,18 @@ import scala.util.Random
 class PersonGenerator(rand: Random) {
   import PersonGenerator._
 
-  def next = Person(names(rand.nextInt(names.size)), surnames(rand.nextInt(surnames.size)))
+  def next =
+    Person(names(rand.nextInt(names.size - 1)),
+           surnames(rand.nextInt(surnames.size - 1)),
+           nextSeq(tags, 4).toSet)
 
+  def nextSeq[A](source: Vector[A], total: Int): Seq[A] =
+    (for (i <- 1 to total) yield source(rand.nextInt(source.size - 1)))
 }
 
 object PersonGenerator {
+
+  def newPersonGenerator = new PersonGenerator(new Random())
 
   val names = Vector(
     "Martin",
@@ -415,6 +422,19 @@ object PersonGenerator {
     "Genevieve",
     "Jean-Paul",
     "Estelle"
+  )
+
+  val tags = Vector(
+    "red",
+    "blue",
+    "orange",
+    "pink",
+    "gray",
+    "purple",
+    "navy",
+    "brown",
+    "white",
+    "black"
   )
 
 }

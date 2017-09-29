@@ -3,9 +3,10 @@ package user.controllers
 import scala.concurrent.ExecutionContext
 
 import core.utils.Logging
-import model.Person
+import model.{PersonGenerator}
 import play.api.libs.ws.WSClient
 import play.api.mvc._
+import play.api.libs.json._
 
 class HomeController(cc: ControllerComponents, wsClient: WSClient)(implicit ec: ExecutionContext)
     extends AbstractController(cc)
@@ -16,14 +17,10 @@ class HomeController(cc: ControllerComponents, wsClient: WSClient)(implicit ec: 
     Ok(core.views.html.index())
   }
 
-  def people = Action {
-    Ok(
-      Seq(
-        Person("Joe", "", Set("red", "bleu")),
-        Person("Mary", "", Set("pink", "gray", "bleu")),
-        Person("Moe", "", Set("brown", "bleu"))
-      ).toString
-    )
+  def people(howMany: Int) = Action {
+    val personGenerator = PersonGenerator.newPersonGenerator
+    val plist = for (i <- 1 to howMany) yield personGenerator.next
+    Ok(Json.toJson(plist))
   }
 
   def about = Action {

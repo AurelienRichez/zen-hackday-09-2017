@@ -45,6 +45,11 @@ scalafmtOnCompile in ThisBuild := true
 
 lazy val jenny = (project in file("jenny"))
   .settings(commonSettings: _*)
+  .settings(
+    libraryDependencies ++= Seq(
+      "com.typesafe.play" %% "play-json" % "2.6.1"
+    )
+  )
 
 lazy val app = (project in file("server"))
   .enablePlugins(PlayScala, BuildInfoPlugin, DockerPlugin)
