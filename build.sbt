@@ -1,7 +1,7 @@
 import ReleaseTransformations._
 
 organization := "io.zengularity"
-name := """new-project"""
+name := """YZX"""
 
 val timestamp = new java.text.SimpleDateFormat("yyyyMMdd-HHmm").format(new java.util.Date)
 
@@ -39,6 +39,12 @@ val noPublish = Seq(
   publishTo := None,
   publish := {}
 )
+
+scalafmtVersion := "1.2.0"
+scalafmtOnCompile in ThisBuild := true
+
+lazy val jenny = (project in file("jenny"))
+  .settings(commonSettings: _*)
 
 lazy val app = (project in file("server"))
   .enablePlugins(PlayScala, BuildInfoPlugin, DockerPlugin)
@@ -89,10 +95,12 @@ lazy val app = (project in file("server"))
       pushChanges
     )
   )
-
-scalafmtVersion := "1.2.0"
-scalafmtOnCompile in ThisBuild := true
+  .dependsOn(jenny)
+  .aggregate(jenny)
 
 lazy val root = (project in file("."))
   .settings(noPublish)
-  .aggregate(app)
+  .aggregate(
+    jenny,
+    app
+  )
