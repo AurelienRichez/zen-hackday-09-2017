@@ -11,7 +11,8 @@ object Metrics extends Logging {
 
   def start(lifecycle: ApplicationLifecycle, config: Configuration): Unit = {
     val enabled = config.getBoolean("metrics.enabled").required
-    val jmxEnabled = config.getBoolean("kamon.system-metrics.jmx-enabled").optional.getOrElse(false)
+    val jmxEnabled =
+      config.getBoolean("kamon.system-metrics.jmx-enabled").optional.getOrElse(false)
 
     if (enabled) {
       Kamon.start(config.configuration.underlying)
@@ -42,8 +43,10 @@ object CpuUsageMetrics extends JmxSystemMetricRecorderCompanion("jmx-cpu") {
     new CpuUsageMetrics(instrumentFactory)
 }
 
-class CpuUsageMetrics(instrumentFactory: InstrumentFactory) extends GenericEntityRecorder(instrumentFactory) {
-  val operatingSystemBean = ManagementFactory.getOperatingSystemMXBean().asInstanceOf[OperatingSystemMXBean]
+class CpuUsageMetrics(instrumentFactory: InstrumentFactory)
+    extends GenericEntityRecorder(instrumentFactory) {
+  val operatingSystemBean =
+    ManagementFactory.getOperatingSystemMXBean().asInstanceOf[OperatingSystemMXBean]
 
   gauge("process-cpu-usage", () => {
     (operatingSystemBean.getProcessCpuLoad() * 100).toLong

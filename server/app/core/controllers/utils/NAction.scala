@@ -53,8 +53,10 @@ object CheckResult {
 case class RequestWithTag[A, Tag](request: Request[A], tag: Tag) extends WrappedRequest(request)
 
 object NAction {
-  def async[A, Tag](checkFunction: RequestHeader => Future[Either[Result, Tag]])(bodyParser: BodyParser[A])(
-    block: RequestWithTag[A, Tag]                => Future[Result]
+  def async[A, Tag](
+    checkFunction: RequestHeader => Future[Either[Result, Tag]]
+  )(bodyParser: BodyParser[A])(
+    block: RequestWithTag[A, Tag] => Future[Result]
   )(implicit cc: ControllerComponents, mat: Materializer): NAction[A, Tag] =
     new NAction[A, Tag](cc, mat) {
       def parser = bodyParser
@@ -62,8 +64,10 @@ object NAction {
       def apply(request: RequestWithTag[A, Tag]): Future[Result] = block(request)
     }
 
-  def apply[A, Tag](check: RequestHeader => Future[Either[Result, Tag]])(bodyParser: BodyParser[A])(
-    block: RequestWithTag[A, Tag]        => Result
+  def apply[A, Tag](check: RequestHeader => Future[Either[Result, Tag]])(
+    bodyParser: BodyParser[A]
+  )(
+    block: RequestWithTag[A, Tag] => Result
   )(implicit cc: ControllerComponents, mat: Materializer): NAction[A, Tag] =
     async(check)(bodyParser) { req =>
       Future.successful(block(req))
@@ -82,7 +86,9 @@ abstract class NActionBuilder[+Tag](
   // Functions to build an NAction from this builder:
 
   /** Function to instantiate a NAction from the NActionBuilder */
-  def async[A, T1 >: Tag](bodyParser: BodyParser[A])(block: RequestWithTag[A, T1] => Future[Result]): NAction[A, T1] =
+  def async[A, T1 >: Tag](
+    bodyParser: BodyParser[A]
+  )(block: RequestWithTag[A, T1] => Future[Result]): NAction[A, T1] =
     new NAction[A, T1](controllerComponents, materializer) {
       def parser = bodyParser
       def check(rh: RequestHeader) = self.partial(rh).map {
@@ -94,7 +100,9 @@ abstract class NActionBuilder[+Tag](
     }
 
   /** Contruct a NAction with a body parser and a block */
-  def apply[A, T1 >: Tag](bodyParser: BodyParser[A])(block: RequestWithTag[A, T1] => Result): NAction[A, T1] =
+  def apply[A, T1 >: Tag](
+    bodyParser: BodyParser[A]
+  )(block: RequestWithTag[A, T1] => Result): NAction[A, T1] =
     async[A, T1](bodyParser) { req: RequestWithTag[A, T1] =>
       Future.successful(block(req))
     }

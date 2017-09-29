@@ -9,12 +9,19 @@ import kamon.metric.instrument.{InstrumentFactory, Time}
 import kamon.metric.{EntityRecorderFactory, GenericEntityRecorder}
 import kamon.util.SameThreadExecutionContext
 import play.api.Logger
-import play.api.libs.ws.{StandaloneWSRequest, StandaloneWSResponse, WSClient, WSRequestExecutor, WSRequestFilter}
+import play.api.libs.ws.{
+  StandaloneWSRequest,
+  StandaloneWSResponse,
+  WSClient,
+  WSRequestExecutor,
+  WSRequestFilter
+}
 
 /** Wrapper for a WS Client that adds logging and metrics to the ws client */
 object WSClientInstrumented {
   def apply(wsClient: WSClient): WSClient = new WSClient {
-    val wsRequestFilter = new WSRequestFilterInstrumented(Logger("wsclient"), SameThreadExecutionContext)
+    val wsRequestFilter =
+      new WSRequestFilterInstrumented(Logger("wsclient"), SameThreadExecutionContext)
     override def close() = wsClient.close()
     override def underlying[T] = wsClient.asInstanceOf[T]
     override def url(url: String) = wsClient.url(url).withRequestFilter(wsRequestFilter)
@@ -51,21 +58,33 @@ class WSRequestFilterInstrumented(logger: Logger, ec: ExecutionContext) extends 
   private def logRequest(requestId: Int, request: StandaloneWSRequest): Unit =
     logger.trace(s"WS id=${requestId}: ${request.method} ${request.url} starts")
 
-  private def logResponse(requestId: Int, request: StandaloneWSRequest, response: StandaloneWSResponse): Unit =
+  private def logResponse(
+    requestId: Int,
+    request: StandaloneWSRequest,
+    response: StandaloneWSResponse
+  ): Unit =
     response.status match {
       case status if status >= 100 && status < 300 || status == 303 || status == 304 =>
-        logger.trace(s"WS id=${requestId}: ${request.method} ${request.url} completed with status ${status}")
+        logger.trace(
+          s"WS id=${requestId}: ${request.method} ${request.url} completed with status ${status}"
+        )
       case status if status >= 300 && status < 500 =>
-        logger.warn(s"WS id=${requestId}: ${request.method} ${request.url} completed with a bad response: ${status}")
+        logger.warn(
+          s"WS id=${requestId}: ${request.method} ${request.url} completed with a bad response: ${status}"
+        )
       case status =>
-        logger.error(s"WS id=${requestId}: ${request.method} ${request.url} failed with status ${status}")
+        logger.error(
+          s"WS id=${requestId}: ${request.method} ${request.url} failed with status ${status}"
+        )
     }
 
   private def logError(requestId: Int, request: StandaloneWSRequest, error: Throwable): Unit =
-    logger.error(s"WS id=${requestId}: ${request.method} ${request.url} encountered an exception", error)
+    logger.error(s"WS id=${requestId}: ${request.method} ${request.url} encountered an exception",
+                 error)
 }
 
-class WSClientMetrics(instrumentFactory: InstrumentFactory) extends GenericEntityRecorder(instrumentFactory) {
+class WSClientMetrics(instrumentFactory: InstrumentFactory)
+    extends GenericEntityRecorder(instrumentFactory) {
   def recordError(start: Long): Unit = record("error", start)
   def recordResponse(status: Int, start: Long): Unit = record(status.toString, start)
   private def record(statusCode: String, start: Long): Unit = {
@@ -76,5 +95,6 @@ class WSClientMetrics(instrumentFactory: InstrumentFactory) extends GenericEntit
 }
 object WSClientMetrics extends EntityRecorderFactory[WSClientMetrics] {
   val category: String = "ws-client"
-  def createRecorder(instrumentFactory: InstrumentFactory): WSClientMetrics = new WSClientMetrics(instrumentFactory)
+  def createRecorder(instrumentFactory: InstrumentFactory): WSClientMetrics =
+    new WSClientMetrics(instrumentFactory)
 }

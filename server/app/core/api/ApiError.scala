@@ -4,7 +4,12 @@ import play.api.libs.json._
 import play.api.mvc._
 import play.api.i18n.Messages
 
-case class ApiError(status: Results.Status, key: String, jsError: JsError, args: Seq[Any] = Seq.empty)(
+case class ApiError(
+  status: Results.Status,
+  key: String,
+  jsError: JsError,
+  args: Seq[Any] = Seq.empty
+)(
   implicit messages: Messages
 ) {
 
@@ -22,7 +27,8 @@ case class ApiError(status: Results.Status, key: String, jsError: JsError, args:
           case (acc, (jsPath, seqValidationErrors)) =>
             acc + (pathDotted(jsPath) -> JsArray(
               seqValidationErrors.flatMap { err =>
-                err.messages.map(key => Json.obj("key" -> key, "message" -> Messages(key, err.args: _*)))
+                err.messages
+                  .map(key => Json.obj("key" -> key, "message" -> Messages(key, err.args: _*)))
               }
             ))
         }

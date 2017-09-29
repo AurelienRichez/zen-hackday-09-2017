@@ -19,7 +19,8 @@ class MetricsFilter()(implicit val mat: Materializer) extends Filter {
       "path" -> normalizedPath,
       "method" -> request.method
     )
-    val httpPathMetrics = Kamon.metrics.entity(HttpPathMetrics, name = "metrics-filter", tags = tags)
+    val httpPathMetrics =
+      Kamon.metrics.entity(HttpPathMetrics, name = "metrics-filter", tags = tags)
     val start = System.nanoTime()
 
     httpServerMetrics.queueSize.increment()
@@ -47,9 +48,11 @@ object MetricsFilter {
     }
 }
 
-class HttpPathMetrics(instrumentFactory: InstrumentFactory) extends GenericEntityRecorder(instrumentFactory) {
+class HttpPathMetrics(instrumentFactory: InstrumentFactory)
+    extends GenericEntityRecorder(instrumentFactory) {
   def recordError(start: Long): Unit = record("500", start)
-  def recordResponse(result: Result, start: Long): Unit = record(result.header.status.toString, start)
+  def recordResponse(result: Result, start: Long): Unit =
+    record(result.header.status.toString, start)
   private def record(status: String, start: Long): Unit = {
     val time = System.nanoTime() - start
     counter(status).increment()
@@ -59,10 +62,12 @@ class HttpPathMetrics(instrumentFactory: InstrumentFactory) extends GenericEntit
 
 object HttpPathMetrics extends EntityRecorderFactory[HttpPathMetrics] {
   def category: String = "http-server"
-  def createRecorder(instrumentFactory: InstrumentFactory): HttpPathMetrics = new HttpPathMetrics(instrumentFactory)
+  def createRecorder(instrumentFactory: InstrumentFactory): HttpPathMetrics =
+    new HttpPathMetrics(instrumentFactory)
 }
 
-class HttpServerMetrics(instrumentFactory: InstrumentFactory) extends GenericEntityRecorder(instrumentFactory) {
+class HttpServerMetrics(instrumentFactory: InstrumentFactory)
+    extends GenericEntityRecorder(instrumentFactory) {
   val queueSize = minMaxCounter("queue-size")
 }
 

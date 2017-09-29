@@ -14,8 +14,12 @@ import user.models.ApiKey
 class Auth(
   settings: Settings,
   apiKeyService: ApiKeyService
-)(implicit ec: ExecutionContext, mat: Materializer, val messagesApi: MessagesApi, cc: ControllerComponents)
-    extends I18nSupport {
+)(
+  implicit ec: ExecutionContext,
+  mat: Materializer,
+  val messagesApi: MessagesApi,
+  cc: ControllerComponents
+) extends I18nSupport {
 
   /** Method to extract the api key from a request and to test its validity */
   val apiKeyChecker = NActionBuilder.fromPartial[ApiKey] {

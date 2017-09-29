@@ -43,7 +43,8 @@ class CustomComponents(context: ApplicationLoader.Context)
   // services
   lazy val apiKeyService = new user.services.ApiKeyService()
 
-  lazy val auth = new Auth(settings, apiKeyService)(defaultEc, materializer, messagesApi, controllerComponents)
+  lazy val auth =
+    new Auth(settings, apiKeyService)(defaultEc, materializer, messagesApi, controllerComponents)
 
   lazy val router: Router = new Routes(
     httpErrorHandler,
