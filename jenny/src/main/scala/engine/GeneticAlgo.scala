@@ -1,18 +1,68 @@
 package engine
 
 import model.Person
+import utils.IdGenerator
 
 import scala.util.Random
 
-case class GeneticAlgo(params: GenerationParameters) {
+case class GeneticAlgo(
+  params: GenerationParameters,
+  people: Seq[Person],
+  populationSize: Int = GeneticAlgo.defaultPopulationSize
+) {
+  require(params.groupMaxSizes.sum >= people.size)
+
+  private def cost(genes: Seq[Seat]): Double = genesToGroups(genes).map(params.totalCost).sum
 
   def generations()(implicit random: Random = new Random()): Iterator[Generation] =
     Iterator.iterate(init()) { previousGeneration =>
       ???
     }
 
-  private def init()(implicit random: Random): Generation = ???
+  private def init()(implicit random: Random): Generation = {
+    val size = params.groupMaxSizes.sum
+    val base = people.map(OccupiedSeat.apply) ++ emptySeats().take(size - people.size)
+    val population = Stream.continually(random.shuffle(base)).take(populationSize)
+    Generation(population, findBest(population))
+  }
+
+  private def emptySeats()(implicit random: Random) =
+    Stream.continually(EmptySeat(IdGenerator.genId()))
+
+  private def findBest(population: Seq[Seq[Seat]]) = {
+    population.minBy(cost)
+  }
+
+  private def genesToGroups(seats: Seq[Seat]): Seq[Seq[Person]] = {
+    def foo(seats: Seq[Seat], maxSizes: List[Int], acc: List[Seq[Person]]): Seq[Seq[Person]] =
+      maxSizes match {
+        case size :: tail =>
+          val (group, remaining) = seats.splitAt(size)
+          foo(remaining, tail, group.flatMap(_.toOpt) +: acc)
+        case Nil => acc
+      }
+
+    foo(seats, params.groupMaxSizes, Nil)
+  }
+}
+
+object GeneticAlgo {
+
+  val defaultPopulationSize = 2000
+}
+
+case class Generation(individuals: Seq[Seq[Seat]], best: Seq[Seat])
+
+sealed trait Seat extends Product with Serializable {
+
+  def toOpt: Option[Person] = this match {
+    case EmptySeat(_)                 => None
+    case OccupiedSeat(person: Person) => Some(person)
+  }
 
 }
 
-case class Generation(individuals: Seq[Seq[Option[Person]]], best: Seq[Option[Person]])
+// We need an id to be able to differentiate, which is not possible with an option
+case class EmptySeat(id: String) extends Seat
+
+case class OccupiedSeat(person: Person) extends Seat
