@@ -21,10 +21,7 @@ class GroupsShouldHaveTagRatio(ratioMap: Map[String, Double]) extends Criterion 
   }
 
   private def mapDiff(effectiveRatio: Map[String, Double]): Double =
-    ratios
-      .mapValues { case (tag, idealRatio) => math.abs(effectiveRatio(tag) - idealRatio) }
-      .values
-      .sum
+    ratios.map { case (tag, idealRatio) => math.abs(effectiveRatio(tag) - idealRatio) }.sum
 
 }
 
