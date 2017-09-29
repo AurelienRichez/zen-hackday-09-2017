@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "baseUrl": ".",
+    "paths": { "*": [ "src/*", "@types/*" ]},
+    "module": "commonjs",
+    "target": "es5",
+    "jsx": "react",
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "strictNullChecks": true,
+    "skipLibCheck": true,
+    "typeRoots": [ "@types/", "node_modules/@types/" ],
+    "types": [ "react", "react-dom" ]
+  },
+  "compileOnSave": false,
+  "buildOnSave": false,
+  "atom": {
+    "compileOnSave": false,
+    "buildOnSave": false,
+    "rewriteTsconfig": false
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "filesGlob": [
+    "typings.d.ts",
+    "classnames.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ]
+}

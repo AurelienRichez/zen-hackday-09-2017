@@ -34,7 +34,13 @@ val commonSettings = Seq(
   sources in (Compile, doc) := Seq.empty
 )
 
-lazy val root = (project in file("."))
+val noPublish = Seq(
+  publishArtifact := false,
+  publishTo := None,
+  publish := {}
+)
+
+lazy val app = (project in file("server"))
   .enablePlugins(PlayScala, BuildInfoPlugin, DockerPlugin)
   .settings(commonSettings: _*)
   .settings(
@@ -86,3 +92,7 @@ lazy val root = (project in file("."))
 
 scalafmtVersion := "1.2.0"
 scalafmtOnCompile in ThisBuild := true
+
+lazy val root = (project in file("."))
+  .settings(noPublish)
+  .aggregate(app)

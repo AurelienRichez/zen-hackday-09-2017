@@ -7,16 +7,15 @@ import play.api.mvc._
 import scala.concurrent.Future
 
 /**
-  * NAction are a replacement to play.api.mvc.Action.
-  * NAction allow to have a check directly on the request headers before applying the body parser
-  *
-  * Using the NActionBuilder you also have a better way to compose action with `or` and `and` operators
-  */
+ * NAction are a replacement to play.api.mvc.Action.
+ * NAction allow to have a check directly on the request headers before applying the body parser
+ *
+ * Using the NActionBuilder you also have a better way to compose action with `or` and `and` operators
+ */
 abstract class NAction[A, Tag](
-    protected val controllerComponents: ControllerComponents,
-    materializer: Materializer
-) extends EssentialAction {
-  self =>
+  protected val controllerComponents: ControllerComponents,
+  materializer: Materializer
+) extends EssentialAction { self =>
   def check(rh: RequestHeader): Future[Either[Result, Tag]]
   def parser: BodyParser[A]
   def apply(request: RequestWithTag[A, Tag]): Future[Result]
@@ -49,14 +48,15 @@ object CheckResult {
 }
 
 /**
-  * This class wraps a Request and allow to set some tag that is extracted from the request headers
-  */
+ * This class wraps a Request and allow to set some tag that is extracted from the request headers
+ */
 case class RequestWithTag[A, Tag](request: Request[A], tag: Tag) extends WrappedRequest(request)
 
 object NAction {
-  def async[A, Tag](checkFunction: RequestHeader => Future[Either[Result, Tag]])(
-      bodyParser: BodyParser[A])(
-      block: RequestWithTag[A, Tag] => Future[Result]
+  def async[A, Tag](
+    checkFunction: RequestHeader => Future[Either[Result, Tag]]
+  )(bodyParser: BodyParser[A])(
+    block: RequestWithTag[A, Tag] => Future[Result]
   )(implicit cc: ControllerComponents, mat: Materializer): NAction[A, Tag] =
     new NAction[A, Tag](cc, mat) {
       def parser = bodyParser
@@ -64,8 +64,10 @@ object NAction {
       def apply(request: RequestWithTag[A, Tag]): Future[Result] = block(request)
     }
 
-  def apply[A, Tag](check: RequestHeader => Future[Either[Result, Tag]])(bodyParser: BodyParser[A])(
-      block: RequestWithTag[A, Tag] => Result
+  def apply[A, Tag](check: RequestHeader => Future[Either[Result, Tag]])(
+    bodyParser: BodyParser[A]
+  )(
+    block: RequestWithTag[A, Tag] => Result
   )(implicit cc: ControllerComponents, mat: Materializer): NAction[A, Tag] =
     async(check)(bodyParser) { req =>
       Future.successful(block(req))
@@ -73,8 +75,8 @@ object NAction {
 }
 
 abstract class NActionBuilder[+Tag](
-    implicit val controllerComponents: ControllerComponents,
-    materializer: Materializer
+  implicit val controllerComponents: ControllerComponents,
+  materializer: Materializer
 ) { self =>
   implicit val ec = controllerComponents.executionContext
 
@@ -84,8 +86,9 @@ abstract class NActionBuilder[+Tag](
   // Functions to build an NAction from this builder:
 
   /** Function to instantiate a NAction from the NActionBuilder */
-  def async[A, T1 >: Tag](bodyParser: BodyParser[A])(
-      block: RequestWithTag[A, T1] => Future[Result]): NAction[A, T1] =
+  def async[A, T1 >: Tag](
+    bodyParser: BodyParser[A]
+  )(block: RequestWithTag[A, T1] => Future[Result]): NAction[A, T1] =
     new NAction[A, T1](controllerComponents, materializer) {
       def parser = bodyParser
       def check(rh: RequestHeader) = self.partial(rh).map {
@@ -97,8 +100,9 @@ abstract class NActionBuilder[+Tag](
     }
 
   /** Contruct a NAction with a body parser and a block */
-  def apply[A, T1 >: Tag](bodyParser: BodyParser[A])(
-      block: RequestWithTag[A, T1] => Result): NAction[A, T1] =
+  def apply[A, T1 >: Tag](
+    bodyParser: BodyParser[A]
+  )(block: RequestWithTag[A, T1] => Result): NAction[A, T1] =
     async[A, T1](bodyParser) { req: RequestWithTag[A, T1] =>
       Future.successful(block(req))
     }
@@ -138,7 +142,7 @@ abstract class NActionBuilder[+Tag](
 object NActionBuilder {
 
   def fromPartial[Tag](
-      check: PartialFunction[RequestHeader, Future[Either[Result, Tag]]]
+    check: PartialFunction[RequestHeader, Future[Either[Result, Tag]]]
   )(implicit controllerComponents: ControllerComponents, mat: Materializer): NActionBuilder[Tag] =
     new NActionBuilder[Tag] {
       def partial(rh: RequestHeader) =

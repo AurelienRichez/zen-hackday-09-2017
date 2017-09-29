@@ -11,7 +11,8 @@ object Metrics extends Logging {
 
   def start(lifecycle: ApplicationLifecycle, config: Configuration): Unit = {
     val enabled = config.getBoolean("metrics.enabled").required
-    val jmxEnabled = config.getBoolean("kamon.system-metrics.jmx-enabled").optional.getOrElse(false)
+    val jmxEnabled =
+      config.getBoolean("kamon.system-metrics.jmx-enabled").optional.getOrElse(false)
 
     if (enabled) {
       Kamon.start(config.configuration.underlying)
