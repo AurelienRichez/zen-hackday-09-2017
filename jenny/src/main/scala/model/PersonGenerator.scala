@@ -6,12 +6,15 @@ class PersonGenerator(rand: Random) {
   import PersonGenerator._
 
   def next =
-    Person(names(rand.nextInt(names.size - 1)),
+    Person(genId(),
+           names(rand.nextInt(names.size - 1)),
            surnames(rand.nextInt(surnames.size - 1)),
            nextSeq(tags, 4).toSet)
 
   def nextSeq[A](source: Vector[A], total: Int): Seq[A] =
     (for (i <- 1 to total) yield source(rand.nextInt(source.size - 1)))
+
+  def genId() = rand.alphanumeric.take(10).mkString
 }
 
 object PersonGenerator {
