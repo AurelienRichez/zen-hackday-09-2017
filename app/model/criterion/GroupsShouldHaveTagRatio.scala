@@ -1,8 +1,8 @@
 package model.criterion
 import model.Person
 
-class GroupShouldHaveTagRatio(ratioMap: Map[String, Double]) extends Criterion {
-  import GroupShouldHaveTagRatio._
+class GroupsShouldHaveTagRatio(ratioMap: Map[String, Double]) extends Criterion {
+  import GroupsShouldHaveTagRatio._
 
   private val ratios = normalizedMap(ratioMap)
 
@@ -28,7 +28,7 @@ class GroupShouldHaveTagRatio(ratioMap: Map[String, Double]) extends Criterion {
 
 }
 
-object GroupShouldHaveTagRatio {
+object GroupsShouldHaveTagRatio {
 
   private def normalizedMap(map: Map[String, Double]) = {
     val sum = map.values.sum
