@@ -6,6 +6,9 @@
     "watch": "webpack --config build/conf.js --watch "
   },
   "dependencies": {
+    "@types/es6-promise": "^0.0.33",
+    "@types/whatwg-fetch": "^0.0.33",
+    "fluxx": "^0.14.15",
     "react": "16.0.0",
     "react-dom": "^16.0.0"
   },
@@ -20,6 +23,7 @@
     "style-loader": "^0.18.2",
     "stylus-loader": "^3.0.1",
     "typescript": "^2.5.3",
-    "webpack": "3.6.0"
+    "webpack": "3.6.0",
+    "whatwg-fetch": "^2.0.3"
   }
 }

@@ -12,7 +12,7 @@
     "strictNullChecks": true,
     "skipLibCheck": true,
     "typeRoots": [ "@types/", "node_modules/@types/" ],
-    "types": [ "react", "react-dom" ]
+    "types": [ "react", "react-dom", "whatwg-fetch", "es6-promise" ]
   },
   "compileOnSave": false,
   "buildOnSave": false,
