@@ -22,12 +22,20 @@ case class GeneticAlgo(
     currentGeneration: Generation
   )(implicit rand: Random): Generation = {
     val population = for (i <- 0 to populationSize) yield {
-      val breeder1 = findBest(rand.shuffle(currentGeneration.population).take(tournamentSize))
-      val breeder2 = findBest(rand.shuffle(currentGeneration.population).take(tournamentSize))
+      val breeder1 = tournament(currentGeneration, rand)
+      val breeder2 = tournament(currentGeneration, rand)
       breed(breeder1, breeder2)
     }
     val best = findBest(currentGeneration.best +: population)
+    println("best:" + cost(best))
     Generation(population, best)
+  }
+
+  private def tournament(currentGeneration: Generation, rand: Random) = {
+    findBest(
+      for (i <- 1 to tournamentSize)
+        yield currentGeneration.population(rand.nextInt(currentGeneration.population.size))
+    )
   }
 
   private def breed(breeder1: Seq[Seat], breeder2: Seq[Seat])(implicit rand: Random): Seq[Seat] = {
@@ -50,7 +58,7 @@ case class GeneticAlgo(
     population.minBy(cost)
   }
 
-  private def genesToGroups(seats: Seq[Seat]): Seq[Seq[Person]] = {
+  def genesToGroups(seats: Seq[Seat]): Seq[Seq[Person]] = {
     def foo(seats: Seq[Seat], maxSizes: List[Int], acc: List[Seq[Person]]): Seq[Seq[Person]] =
       maxSizes match {
         case size :: tail =>
@@ -65,7 +73,7 @@ case class GeneticAlgo(
 
 object GeneticAlgo {
 
-  val defaultPopulationSize = 2000
+  val defaultPopulationSize = 1000
 
   val defaultTournamentSize = 5
 }

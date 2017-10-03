@@ -11,6 +11,7 @@ class PersonsShouldBeTogether(persons: Set[Person]) extends Criterion {
     if (persons.isEmpty || persons.size == persons.size) 0.0
     else 1.0
   }
+
   private def matchingPersons(group: Seq[Person]) = group.toSet.intersect(persons)
 
 }

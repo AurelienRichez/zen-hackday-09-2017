@@ -20,7 +20,7 @@ class PersonGenerator(rand: Random) {
 
 object PersonGenerator {
 
-  def newPersonGenerator = new PersonGenerator(new Random())
+  def newPersonGenerator(random: Random = new Random()) = new PersonGenerator(random)
 
   val names = Vector(
     "Martin",
